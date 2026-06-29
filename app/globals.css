@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Ocultar barra de scroll para navegadores basados en Chrome/Safari/Edge */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ocultar barra de scroll para Firefox */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
