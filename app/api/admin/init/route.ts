@@ -3,6 +3,23 @@ import supabaseAdmin from "@/lib/supabaseAdmin"
 import MENU from "@/data/menu"
 import { requireAdminSecret } from "@/lib/adminAuth"
 
+type RestaurantIdRow = {
+  id: number
+}
+
+type CategoryRow = {
+  id: number
+  name: string
+}
+
+type ItemRow = {
+  id: number
+  category_id: number
+  name: string
+  price: number
+  description: string | null
+}
+
 export async function POST(request: Request) {
   const authError = requireAdminSecret(request)
   if (authError) return authError
@@ -15,25 +32,33 @@ export async function POST(request: Request) {
     const restaurantPayload = MENU.restaurant
 
     // 1) find or create restaurant by handle
-    const { data: existing, error: rErr } = await supabaseAdmin
+    const { data: existing, error: eErr } = (await supabaseAdmin
       .from("restaurants")
       .select("id")
       .eq("handle", restaurantPayload.handle)
-      .limit(1)
+      .limit(1)) as { data: { id: number }[] | null; error: any }
 
-    if (rErr) throw rErr
+    if (eErr) throw eErr
+
+    const existingRestaurant = existing && existing.length > 0 ? existing[0] : null
 
     let restaurantId: number
     if (existing && existing.length > 0) {
       restaurantId = existing[0].id
     } else {
-      const { data: insRes, error: iErr } = await supabaseAdmin
+      restaurantId = 0
+    }
+    if (restaurantId === 0) {
+      const insRes = (await supabaseAdmin
         .from("restaurants")
-        .insert({ name: restaurantPayload.name, handle: restaurantPayload.handle })
+        .insert({ name: restaurantPayload.name, handle: restaurantPayload.handle } as any)
         .select("id")
-        .limit(1)
-      if (iErr) throw iErr
-      restaurantId = insRes[0].id
+        .limit(1)) as any
+
+      if (insRes.error) throw insRes.error
+
+      const inserted = insRes.data as Array<{ id: number }> | null
+      restaurantId = inserted?.[0]?.id ?? 0
     }
 
     // 2) delete existing categories (and cascade items) for a clean seed
