@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     if (catErr) throw catErr
 
     // map category name -> id
-    const categoryIdMap: Record<string, number> = {}
+    const categoryIdMap: Record<string, number> = {};
     (insertedCategories || []).forEach((c: any) => {
       categoryIdMap[c.name] = c.id
     })
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
 
     let itemsInserted = 0
     if (itemsToInsert.length > 0) {
-      const { data: insItems, error: itemsErr } = await supabaseAdmin.from("items").insert(itemsToInsert).select("id")
+      const { data: insItems, error: itemsErr } = await supabaseAdmin.from("items").insert(itemsToInsert as any).select("id")
       if (itemsErr) throw itemsErr
       itemsInserted = (insItems || []).length
     }

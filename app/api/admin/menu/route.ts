@@ -18,17 +18,17 @@ export async function GET(request: Request) {
     let restaurantQuery = supabaseAdmin.from("restaurants").select("id,name,handle").limit(1)
     if (slug) restaurantQuery = restaurantQuery.eq("handle", slug)
 
-    const { data: restaurants, error: rErr } = await restaurantQuery
+    const { data: restaurants, error: rErr } = (await restaurantQuery) as any
     if (rErr) throw rErr
     if (!restaurants || restaurants.length === 0) return NextResponse.json(null, { status: 404 })
 
     const restaurant = restaurants[0]
 
     // Fetch categories
-    const { data: categories, error: cErr } = await supabaseAdmin
+    const { data: categories, error: cErr } = (await supabaseAdmin
       .from("categories")
       .select("id,name")
-      .eq("restaurant_id", restaurant.id)
+      .eq("restaurant_id", restaurant.id)) as any
 
     if (cErr) throw cErr
 
@@ -37,10 +37,10 @@ export async function GET(request: Request) {
     // Fetch items belonging to these categories
     let items: any[] = []
     if (categoryIds.length > 0) {
-      const { data: itemsData, error: iErr } = await supabaseAdmin
+      const { data: itemsData, error: iErr } = (await supabaseAdmin
         .from("items")
         .select("id,category_id,name,price,description")
-        .in("category_id", categoryIds)
+        .in("category_id", categoryIds)) as any
       if (iErr) throw iErr
       items = itemsData || []
     }
