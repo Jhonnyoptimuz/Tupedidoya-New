@@ -28,7 +28,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch("/api/menu")
+    const apiUrl = `${window.location.origin}/api/menu`
+
+    fetch(apiUrl)
       .then((res) => {
         if (!res.ok) throw new Error(`Menu fetch failed: ${res.status}`)
         return res.json()
