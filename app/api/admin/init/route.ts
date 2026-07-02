@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     const categoriesToInsert = restaurantPayload.categories.map((c: any) => ({ restaurant_id: restaurantId, name: c.name }))
     const { data: insertedCategories, error: catErr } = await supabaseAdmin
       .from("categories")
-      .insert(categoriesToInsert)
+      .insert(categoriesToInsert as any)
       .select("id,name")
 
     if (catErr) throw catErr
