@@ -30,9 +30,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data, error } = (await supabaseAdmin
+    const { data, error } = (await (supabaseAdmin as any)
       .from("menu_items")
-      .upsert(menuData as any, { onConflict: ["name", "restaurant_handle"] })) as any
+      .upsert(menuData as any, { onConflict: ["name", "restaurant_handle"] } as any)) as any
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
